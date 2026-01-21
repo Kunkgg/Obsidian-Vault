@@ -1,0 +1,226 @@
+{
+  "main": {
+    "id": "28dfeda5f7937c8f",
+    "type": "split",
+    "children": [
+      {
+        "id": "27f90d3ea7f3f745",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d3ee214fa8c8ff46",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "home.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "home"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "487b563b65a4c52b",
+    "type": "split",
+    "children": [
+      {
+        "id": "97660659bad758bf",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8061ce47b578d8b4",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "6862f22797f566b3",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "e87bd30e2c81d70d",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "51687cf3ccc755a3",
+    "type": "split",
+    "children": [
+      {
+        "id": "e9d2ccb7e3f69644",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "406bdc6bcba323c9",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "home.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "home 的反向链接列表"
+            }
+          },
+          {
+            "id": "1ff22ea1d0f037c7",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "home.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "home 的出链列表"
+            }
+          },
+          {
+            "id": "eba4fd97f33c75bc",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "500edc11774aa897",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "88b09917e5f59699",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "home.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "home 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "d3ee214fa8c8ff46",
+  "lastOpenFiles": [
+    "home_new.md",
+    "00_system/templates/weekly_review.md",
+    "00_system/meta/project.md",
+    "00_system/meta/naming.md",
+    "00_system/templates/project_retro.md",
+    "00_system/templates/project_re",
+    "00_system/templates/project_decisions.md",
+    "00_system/templates/project_log.md",
+    "00_system/templates/project_tasks.md",
+    "00_system/templates/project_index.md",
+    "00_system/templates/project.md",
+    "00_system/meta/tags.md",
+    "home.md",
+    "00_system/meta/note_lifecycle.md",
+    "60_mocs/moc_python.md",
+    "60_mocs/moc_database.md",
+    "30_notes/reviews",
+    "Home.md",
+    "60_mocs/moc_system_design.md",
+    "60_mocs/moc__system_design.md",
+    "60_mocs/moc__python.md",
+    "60_mocs/moc__database.md",
+    "60_mocs/MOC__system_design.md",
+    "60_mocs/MOC__python.md",
+    "60_mocs/MOC__database.md",
+    "60_mocs",
+    "60_MOCs/MOC__system_design.md",
+    "60_MOCs/MOC__python.md",
+    "60_MOCs/MOC__database.md",
+    "90_archived",
+    "40_projects",
+    "30_notes/python",
+    "30_notes/k8s",
+    "30_notes/system_design",
+    "30_notes/db/sqlite",
+    "30_notes/db/postgresql",
+    "未命名.canvas"
+  ]
+}
