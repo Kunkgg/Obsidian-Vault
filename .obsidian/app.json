@@ -1,4 +1,6 @@
 {
   "newFileLocation": "current",
-  "attachmentFolderPath": "00_system/attachments"
+  "attachmentFolderPath": "00_system/attachments",
+  "vimMode": true,
+  "alwaysUpdateLinks": true
 }
