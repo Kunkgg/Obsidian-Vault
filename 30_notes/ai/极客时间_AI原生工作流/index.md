@@ -21,10 +21,9 @@ flowchart
   D --> |AI 生成代码| E[代码]
   E --> F[验证]
 ```
+![](assets/index/file-20260125160859907.png)
 
-![[极客时间_AI原生工作流_传统开发_spec驱动.png]]
-
-![[极客时间_AI原生工作流_speckit.png]]
+![](assets/index/file-20260125160923117.png)
 
 ## 工具选择
 
@@ -34,5 +33,4 @@ Claude Code + 智谱 GLM (国内模型)
 
 ## [[Claude_Code_实战演练.md]]
 
-
-![[claude_code_配置文件关系图.png]]
+![](assets/index/file-20260125161010138.png)

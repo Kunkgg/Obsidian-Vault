@@ -1,5 +1,7 @@
 [
-  "obsidian-vimrc-support",
   "obsidian-excalidraw-plugin",
-  "recent-files-obsidian"
+  "recent-files-obsidian",
+  "obsidian-custom-attachment-location",
+  "obsidian-vimrc-support",
+  "obsidian-git"
 ]
