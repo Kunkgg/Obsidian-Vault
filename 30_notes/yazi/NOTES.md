@@ -29,13 +29,13 @@
 - **第 7 课（自定义命令与快捷键 · 结业）已交付并经用户验证（WSL + Windows 两端）**：`!` 开终端、`g d` 跳下载均通过，跨平台同键靠 `for` 字段。learning record 见 [[0006-lesson7-custom-keys-and-beyond]]。
 - **用户结业后超越教程**（重要，详见 [[0006-lesson7-custom-keys-and-beyond]]）：参照官方维护者 dotfiles `sxyazi/dotfiles`（已加入 RESOURCES），在自家 `Kunkgg/yazi-config` 仓库里加了：① **`package.toml`**（v25+ 插件 lockfile，pin rev+hash）——这**取代**了第 6 课「gitignore plugins/ + 每机 ya pkg add」的做法，插件可声明式跨机器复现；② 额外插件 `git`/`diff`(`<C-d>`)/`smart-enter`(绑 `l`)/`smart-paste`(绑 `p`)/`mount`(`M`,unix-only)/**`folder-rules`**（用户指出是**内置功能、无需 package 安装**——曾被我误判为漏声明，已纠正）；③ `yazi.toml` 设 `linemode=size`/`show_hidden=true`/`sort_by=natural`/preview 大尺寸；④ `theme.toml` 42KB 重度主题。**实现选择**：用户把 `plugins/` **直接提交**进 git（`.gitignore` 只排 `tags/`），与 `package.toml` 并存——belt-and-suspenders，能用，更新插件时 diff 略吵（可二选一精简）。
 - **待用户自查**：`<C-d>` 被 `diff` 占用，可能顶掉默认半页下滚——建议 yazi 里按 `?` 翻 keymap 确认；不用半页滚就无所谓。
-- **课程状态：全 8 节（第 0-7 课）完结 🎓**，mission 所有诉求已落地。
-- **番外第 8 课（压缩包与 opener）已产出，待用户实测**（`lessons/0009-openers-and-archives.html` + `reference/0002-yazi-opener-reference.html`）。用户结业后反馈三个痛点：①解压到子文件夹、③创建压缩包、⑤解压没反馈。已逐条核实解法并写进课里：
+- **课程状态：全 8 节核心（第 0-7 课）+ 番外第 8 课全部完结并通过用户验证 🎓**，mission 所有诉求已落地。
+- **番外第 8 课（压缩包与 opener）已交付并经用户验证**（`lessons/0009-openers-and-archives.html` + `reference/0002-yazi-opener-reference.html`）。用户结业后反馈三个痛点：①解压到子文件夹、③创建压缩包、⑤解压没反馈。已逐条核实解法并写进课里：
   - **⑤反馈**：按 `w`=任务管理器（零配置，多源确认；用户多半是不知道这个键）。
   - **①解压到子目录**：装 `unar`（apt 1.10.1 可装，稳定工具非版本敏感→apt 没问题）+ 自定义 `unpack` opener + `prepend_rules` 抢在默认 `extract` 前。**关键核实**：yazi 二进制内嵌默认配置里**已有** `extract = ya pub extract --list %s`（解到 CWD）+ 压缩包 `[open]` 规则——所以"按 l/o 解压"开箱即有，只是解到 CWD 且无反馈。选 `unar` 不选 `7zz` 的理由：实测 `7zz x foo.zip -ofoo/` 能子目录化，但 opener 的 `%s` 给不出"去扩展名的目录名"，且 shell `${f%.*}` 对 `.tar.gz` 只切 `.gz`→`foo.tar/`（错）；`unar` 全格式正确、自动建同名子目录。
   - **③创建压缩包**：`KKV9/compress.yazi` 插件（官方 Resources 收录，跨平台，`ya pkg add KKV9/compress`，keymap `c a a`）。**PATH 要求**：`.zip`→`zip`、`.7z`→`7z`、`.tar.gz`→`tar`。用户有 `7zz` 无 `7z`/`zip` → 课里让 `sudo apt install zip`（最通用）+ `ln -s /usr/bin/7zz ~/.local/bin/7z`（解锁 `.7z`）。
   - **opener/open 语法**：已从官方 yazi.toml 文档（v26.5.6，docsearch:version 核对）逐条核实 `[opener]`(run/block/orphan/desc/for + `%s`/`%sN`/`%d`/`%%`) 与 `[open]`(url glob/mime glob/use 名或数组、prepend/append/rules、`\s` 前缀转大小写敏感)。完整速查 → `reference/0002-yazi-opener-reference.html`。
-  - **下一步**：等用户跑通三件事（建 zip、解到子目录、`w` 看进度）后写 learning-record `0007`。
+  - **已验证（learning-record `0007` 已写）**：用户回报 opener/open + compress 插件基础已掌握，`w` 任务管理器也已练过（评价「很简单」），三件事全部自验通过。compress 进阶参数（`c a p` 加密码 / `c a l` 压缩级别 / `c a h` 加密文件头）用户明确「暂时用不上」，作为已知但不选项存档，将来要加密码压缩时回看 `lessons/0009` 即可。
 - **剩余（非阻塞）**：Mac / 干净 Linux 未实测（配置同步已验证通用，那两端只差 `ya pkg install` + 补 `fd`/`rg`）。后续按需：从 awesome-yazi 挑插件、养自己的 keymap、遇问题问 GitHub Discussions。
 - **页脚计数**：共 8 节（第 0-7 课），现有 7 个课程的页脚已统一刷成「/ 8 课」。
 - **建议**：每课开新会话（teach 的设计用法），从本文件 resume。
