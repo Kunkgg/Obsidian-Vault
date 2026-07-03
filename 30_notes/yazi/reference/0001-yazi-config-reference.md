@@ -1,6 +1,6 @@
 # Yazi 配置速查表
 
-*参考文档 · 可打印 — 四个配置文件、混合机制、跨平台目录与环境变量，一张表查清。配套：[[lessons/0007-config-and-dotfiles|第 6 课]]。*
+*参考文档 · 可打印 — 四个配置文件、混合机制、跨平台目录与环境变量，一张表查清。配套：[[0007-config-and-dotfiles|第 6 课]]。*
 
 ## 配置文件
 
@@ -68,4 +68,4 @@ ya pkg add boydaihungst/simple-tag
 
 ---
 
-[[lessons/0007-config-and-dotfiles|← 第 6 课 · 配置与跨平台同步]] · **参考文档 0001** · 基于官方 Configuration 文档 v26.5.6
+[[0007-config-and-dotfiles|← 第 6 课 · 配置与跨平台同步]] · **参考文档 0001** · 基于官方 Configuration 文档 v26.5.6

@@ -88,12 +88,12 @@ prepend_keymap = [
 ## 为什么标签不跟着同步
 
 > [!note] 复习第 5 课查实的事实
-> 标签存在 `tags/` 目录里，键是**被标文件的父目录绝对路径**。WSL 是 `/home/...`、Windows 是 `C:\Users\...`——**键不同，标签不能跨机器 / 跨 OS 迁移**。所以上面 `.gitignore` 排掉 `tags/`，标签视作每机本地；dotfiles 只搬配置文件。详见 [[learning-records/0004-lesson5-tags-verified-and-storage|学习记录 0004]]。
+> 标签存在 `tags/` 目录里，键是**被标文件的父目录绝对路径**。WSL 是 `/home/...`、Windows 是 `C:\Users\...`——**键不同，标签不能跨机器 / 跨 OS 迁移**。所以上面 `.gitignore` 排掉 `tags/`，标签视作每机本地；dotfiles 只搬配置文件。详见 [[0004-lesson5-tags-verified-and-storage|学习记录 0004]]。
 
 ## 跨平台注意 · 搜索依赖
 
 > [!warning] clone 配置不够，搜索工具也要装
-> <kbd>s</kbd>（按名搜索）依赖 `fd` 或 `fdfind`。这台 WSL 有 `fdfind`（yazi 自动回退）能用；Mac 用 `brew install fd`；但一台**两者都没装**的干净 Linux / 容器上 <kbd>s</kbd> 会失效——clone 了配置还得补装 `fd`。<kbd>S</kbd>（内容搜索）靠 `ripgrep`（`rg`），同理。详见 [[learning-records/0003-lesson4-s-search-fdfind-fallback|学习记录 0003]]。
+> <kbd>s</kbd>（按名搜索）依赖 `fd` 或 `fdfind`。这台 WSL 有 `fdfind`（yazi 自动回退）能用；Mac 用 `brew install fd`；但一台**两者都没装**的干净 Linux / 容器上 <kbd>s</kbd> 会失效——clone 了配置还得补装 `fd`。<kbd>S</kbd>（内容搜索）靠 `ripgrep`（`rg`），同理。详见 [[0003-lesson4-s-search-fdfind-fallback|学习记录 0003]]。
 
 > [!question] 检索练习
 > 1. 想在默认按键之上「加」自己的键（不覆盖默认），`keymap.toml` 里用哪个关键字开头？
@@ -119,9 +119,9 @@ prepend_keymap = [
 
 [[0006-file-tags|← 第 5 课 · 文件标签]] · **第 6 / 8 课** · [[0008-custom-commands|第 7 课 · 自定义命令与快捷键 →]]
 
-*主源：[官方 Configuration 文档](https://yazi-rs.github.io/docs/configuration/overview/)（v26.5.6，已逐条核实：四个配置文件、`prepend_*`/`append_*` 混合机制、Unix / Windows 配置目录、`YAZI_CONFIG_HOME` 环境变量）、[默认配置（shipped tag）](https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset)。标签存储位置见 [[learning-records/0004-lesson5-tags-verified-and-storage|学习记录 0004]]。*
+*主源：[官方 Configuration 文档](https://yazi-rs.github.io/docs/configuration/overview/)（v26.5.6，已逐条核实：四个配置文件、`prepend_*`/`append_*` 混合机制、Unix / Windows 配置目录、`YAZI_CONFIG_HOME` 环境变量）、[默认配置（shipped tag）](https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset)。标签存储位置见 [[0004-lesson5-tags-verified-and-storage|学习记录 0004]]。*
 
 > [!tip] 💡 问老师
 > 这节课的卡点多半在 git 远端（SSH key、仓库权限）或 Windows 上 clone 路径拼错。把 `git push` 或 Windows 启动 yazi 的报错连同现象贴我，我帮你查。两端都能 <kbd>t</kbd><kbd>g</kbd> 打标签，这节课就成了。
 
-📋 [[reference/0001-yazi-config-reference|配置速查表（参考文档）]] —— 四个文件 + prepend/append + 目录/env 速查，可打印。
+📋 [[0001-yazi-config-reference|配置速查表（参考文档）]] —— 四个文件 + prepend/append + 目录/env 速查，可打印。

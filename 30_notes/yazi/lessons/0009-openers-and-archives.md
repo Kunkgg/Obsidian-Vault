@@ -12,7 +12,7 @@
 - `[opener]` = 给命令**起名字**（"配方"）：`extract`、`edit`、`unpack`… 每个是数组，可按 `for` 分 OS。
 - `[open]` = **匹配规则**：用 `url`（扩展名/路径 glob）或 `mime`（MIME glob）挑 opener。
 
-语法全表见 [[reference/0002-yazi-opener-reference|opener 速查]]。这里只讲关键：yazi **默认就配好了压缩包**——我从你机器的二进制里挖出来的默认规则：
+语法全表见 [[0002-yazi-opener-reference|opener 速查]]。这里只讲关键：yazi **默认就配好了压缩包**——我从你机器的二进制里挖出来的默认规则：
 
 ```toml
 [opener] extract = [ { run = "ya pub extract --list %s", desc = "Extract here" } ]
@@ -115,7 +115,7 @@ ya pkg add KKV9/compress
 
 ---
 
-[[0008-custom-commands|← 第 7 课 · 自定义命令与快捷键]] · **番外 · 压缩包与 opener** · [[reference/0002-yazi-opener-reference|opener 速查 →]]
+[[0008-custom-commands|← 第 7 课 · 自定义命令与快捷键]] · **番外 · 压缩包与 opener** · [[0002-yazi-opener-reference|opener 速查 →]]
 
 *主源：[官方 yazi.toml 文档](https://yazi-rs.github.io/docs/configuration/yazi/)（v26.5.6，`[opener]`/`[open]` 全字段已核实）+ [compress.yazi README](https://github.com/KKV9/compress.yazi)（跨平台、格式表、keymap、PATH 要求）。默认 opener/规则从本机 yazi 二进制内嵌配置核实。`w`=任务管理器见 yazi 键盘参考。*
 

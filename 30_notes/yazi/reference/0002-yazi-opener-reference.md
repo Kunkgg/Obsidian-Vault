@@ -76,4 +76,4 @@ prepend_rules = [
 
 ---
 
-[[lessons/0009-openers-and-archives|← 第 8 课 · 压缩包与 opener]] · **参考文档 0002 · opener/open** · [[0001-yazi-config-reference|配置总速查 →]]
+[[0009-openers-and-archives|← 第 8 课 · 压缩包与 opener]] · **参考文档 0002 · opener/open** · [[0001-yazi-config-reference|配置总速查 →]]

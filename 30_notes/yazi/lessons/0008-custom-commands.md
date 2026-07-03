@@ -123,7 +123,7 @@ Windows 路径的反斜杠在 TOML 里要写成 `\\`（转义）；或用 `cd D:
 - **遇问题问社区**：[GitHub Discussions](https://github.com/sxyazi/yazi/discussions)（维护者亲自回）或 [r/yazi](https://www.reddit.com/r/yazi/)。配置疑难、跨平台差异都能问。
 - **养自己的 keymap**：每次发现「这个操作我天天做、却要点好几下」，就给它绑个键、push。几周后 yazi 就完全是你的了。
 
-所有课程文件都在 `~/.config/yazi/` 的 git 仓库里，跨机器跟着你走。想回看，[[reference/0001-yazi-config-reference|配置速查表]]打印一张贴旁边。
+所有课程文件都在 `~/.config/yazi/` 的 git 仓库里，跨机器跟着你走。想回看，[[0001-yazi-config-reference|配置速查表]]打印一张贴旁边。
 
 ---
 
