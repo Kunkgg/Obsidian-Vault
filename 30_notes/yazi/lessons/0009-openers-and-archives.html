@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 8 课（番外）· 压缩包与 opener</title>
+<link rel="stylesheet" href="../assets/yazi-course.css">
+</head>
+<body>
+<article class="lesson">
+
+  <p class="eyebrow">Yazi 课程 · 番外（结业后按需扩展）</p>
+  <h1>压缩包与 opener</h1>
+  <p class="subtitle">解压到子目录、一键打包、看得见进度——三件事一气呵成。顺手把 opener 彻底弄懂。</p>
+
+  <div class="callout win">
+    <span class="tag">本课的胜利</span>
+    <p>改完能做到：选中几个文件 → <kbd>c</kbd><kbd>a</kbd><kbd>a</kbd> 打成 zip；选中一个 zip → <kbd>l</kbd> 解压进<strong>同名子目录</strong>（不再散落一地）；解压/拷贝/移动时 → <kbd>w</kbd> 看<strong>实时进度</strong>。改完 <code>git push</code>，四平台同步。</p>
+  </div>
+
+  <h2>先懂 · opener 怎么决定"按回车跑什么"</h2>
+  <p>两层（和 keymap/fetcher 同套路），都在 <code>yazi.toml</code>：</p>
+  <ul>
+    <li><code>[opener]</code> = 给命令<strong>起名字</strong>（"配方"）：<code>extract</code>、<code>edit</code>、<code>unpack</code>… 每个是数组，可按 <code>for</code> 分 OS。</li>
+    <li><code>[open]</code> = <strong>匹配规则</strong>：用 <code>url</code>（扩展名/路径 glob）或 <code>mime</code>（MIME glob）挑 opener。</li>
+  </ul>
+  <p>语法全表见 <a href="../reference/0002-yazi-opener-reference.html">opener 速查</a>。这里只讲关键：yazi <strong>默认就配好了压缩包</strong>——我从你机器的二进制里挖出来的默认规则：</p>
+  <pre><code>[opener] extract = [ { run = "ya pub extract --list %s", desc = "Extract here" } ]
+[open]   { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,...}", use = ["extract", "reveal"] }</code></pre>
+  <p>所以"按 <kbd>l</kbd>/<kbd>o</kbd> 解压"开箱就有——只是它解到<strong>当前目录</strong>（文件散落），且没反馈。下面三节逐一修掉。</p>
+
+  <h2>痛点 ⑤ 反馈 → 按 <kbd>w</kbd>（零配置）</h2>
+  <p>extract / copy / move 在 yazi 里都是<strong>后台任务</strong>，有实时进度。按 <kbd>w</kbd> = <strong>任务管理器</strong>（Task Manager）：能看到正在跑的任务、进度、完成通知。<kbd>x</kbd> 取消当前任务。</p>
+  <div class="callout">
+    <span class="tag">你之前"没反馈"多半是不知道这个键</span>
+    <p>不是 yazi 没进度，是进度在任务面板里。下次解压大包时按 <kbd>w</kbd> 看看——这一条不用改任何配置。</p>
+  </div>
+
+  <h2>痛点 ① 解压到子目录 → 自定义 <code>unpack</code> opener</h2>
+  <p>思路：装 <code>unar</code>（自动建"压缩包同名"子目录、全格式、跨平台），再加一个叫 <code>unpack</code> 的 opener，用 <code>prepend_rules</code> 让它<strong>抢在默认 <code>extract</code> 前</strong>。</p>
+  <p><strong>① 装 unar</strong>（稳定工具，apt 没问题；非版本敏感，不像 yazi/fzf 那样要追新版）：</p>
+  <pre><code>sudo apt install unar          # WSL/Debian
+# brew install unar            # macOS
+# Windows: 下载 unar.exe 放 PATH，或 scoop install unar</code></pre>
+  <p><strong>② <code>yazi.toml</code> 加两段</strong>（你目前没有 <code>[opener]</code>/<code>[open]</code> 段，新建即可）：</p>
+  <pre><code>[opener]
+unpack = [
+  { run = "unar %s", desc = "解压到同名子目录", for = "unix" },
+  { run = "unar %s", desc = "解压到同名子目录", for = "windows" },
+]
+
+[open]
+prepend_rules = [
+  { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", use = ["unpack", "extract", "reveal"] },
+]</code></pre>
+  <div class="callout pitfall">
+    <span class="tag">为什么是 unpack 不是覆盖 extract</span>
+    <p>起个新名字 <code>unpack</code> + <code>prepend_rules</code>，<strong>不删默认</strong>。按 <kbd>l</kbd>/<kbd>Enter</kbd> 走第一个（<code>unpack</code>→子目录）；按 <kbd>o</kbd>（<code>open --interactive</code>）弹菜单，三选一：<code>unpack</code>(子目录) / <code>extract</code>(当前目录) / <code>reveal</code>(只选中不打开)。想用哪种用哪种。</p>
+  </div>
+  <div class="callout pitfall">
+    <span class="tag">为什么不直接用 7zz</span>
+    <p>你机器上有 <code>7zz</code>，我实测 <code>7zz x foo.zip -ofoo/ -y</code> 能解到子目录。但 opener 的 <code>%s</code> 给不出"去扩展名的目录名"（要 shell 包装）；而且 <code>${f%.*}</code> 只切最后一个扩展，<code>foo.tar.gz</code> 会切成 <code>foo.tar/</code>。<code>unar</code> 一行搞定、全格式正确——多装一个小工具，换永远清爽。</p>
+  </div>
+
+  <h2>痛点 ③ 创建压缩包 → compress.yazi 插件</h2>
+  <p><strong>① 装插件</strong>：</p>
+  <pre><code>ya pkg add KKV9/compress</code></pre>
+  <p><strong>② 确认 PATH 里有压缩器</strong>（插件按格式调对应工具）：</p>
+  <ul>
+    <li><code>.zip</code> → 需要 <code>zip</code>：<code>sudo apt install zip</code>（最通用，推荐）</li>
+    <li><code>.7z</code> → 需要 <code>7z</code>：你有 <code>7zz</code> 没 <code>7z</code>，<code>ln -s /usr/bin/7zz ~/.local/bin/7z</code>（<code>.local/bin</code> 已在 PATH 最前，见第 0 课）</li>
+    <li><code>.tar.gz</code> → <code>tar</code>+<code>gzip</code>，你都有，免装</li>
+  </ul>
+  <p><strong>③ <code>keymap.toml</code> 的 <code>[mgr]</code> 下，已有 <code>prepend_keymap</code> 数组里追加</strong>：</p>
+  <pre><code>{ on = [ "c", "a", "a" ], run = "plugin compress", desc = "打包选中文件" },</code></pre>
+  <p>用法：选中文件 → <kbd>c</kbd><kbd>a</kbd><kbd>a</kbd> → 输归档名（留空=用文件名/父目录名）→ 输扩展名决定格式（<code>zip</code>/<code>7z</code>/<code>tar.gz</code>…，默认 zip）→ 回车。</p>
+  <p>进阶（同前缀，按需加）：<code>c a p</code> 加密码、<code>c a l</code> 压缩级别、<code>c a h</code> 加密文件头（7z/rar）。<code>c</code> 前缀与默认的 <code>c</code>⇒<code>c</code>(拷路径) 不冲突——按 <code>c</code> 停顿会弹出所有 <code>c</code> 开头的分支。</p>
+
+  <h2>动手 · 三件事打通</h2>
+  <div class="callout verify">
+    <span class="tag">跟着做（WSL）</span>
+    <ol class="steps">
+      <li><code>sudo apt install unar zip</code> + <code>ya pkg add KKV9/compress</code> + <code>ln -s /usr/bin/7zz ~/.local/bin/7z</code></li>
+      <li>编辑 <code>~/.config/yazi/yazi.toml</code>：加上面 <code>[opener]</code> + <code>[open]</code> 两段。</li>
+      <li>编辑 <code>~/.config/yazi/keymap.toml</code>：<code>prepend_keymap</code> 数组里加 <code>c a a</code> 那行。</li>
+      <li><strong>重启 yazi</strong>（<kbd>q</kbd> 再进）。</li>
+      <li><strong>测创建</strong>：选 2 个文件 → <kbd>c</kbd><kbd>a</kbd><kbd>a</kbd> → 输名字 <code>test</code> → 格式 <code>zip</code> → 回车，得 <code>test.zip</code>。</li>
+      <li><strong>测解压</strong>：选中 <code>test.zip</code> → 按 <kbd>l</kbd> → 应出现 <code>test/</code> 子目录，里面是那 2 个文件（不是散落当前目录）。按 <kbd>o</kbd> 能看到 unpack/extract/reveal 三选项。</li>
+      <li><strong>测进度</strong>：找个大压缩包解压，按 <kbd>w</kbd> → 看实时进度，<kbd>x</kbd> 取消。</li>
+      <li>都 OK：<code>cd ~/.config/yazi && git add -A && git commit -m "openers + compress plugin" && git push</code>，Windows <code>git pull</code> + <code>ya pkg install</code> 同步。</li>
+    </ol>
+  </div>
+
+  <div class="quiz">
+    <span class="tag">检索练习</span>
+    <p>1. 想让某类文件"按回车跑自定义命令"，要在 yazi.toml 写哪两段？</p>
+    <p>2. <code>prepend_rules</code> 给压缩包 <code>use = ["unpack","extract"]</code>——按 <kbd>l</kbd> 跑哪个？按 <kbd>o</kbd> 呢？</p>
+    <p>3. 解压大包时想看进度、想取消，各按什么键？</p>
+    <p>4. 同样解压 <code>report.tar.gz</code>，<code>unar</code> 会建什么目录？shell 的 <code>${f%.*}</code> 会建什么？</p>
+    <details><summary>看答案</summary>
+    <p>1. <code>[opener]</code> 定义命令（命名 + run），<code>[open]</code> 写规则（url/mime → use）。</p>
+    <p>2. <kbd>l</kbd> 跑第一个 <code>unpack</code>（解到子目录）；<kbd>o</kbd> 弹菜单列全部（unpack/extract/reveal 三选一）。</p>
+    <p>3. <kbd>w</kbd> 看进度，<kbd>x</kbd> 取消。</p>
+    <p>4. <code>unar</code> → <code>report/</code>（正确）；<code>${f%.*}</code> → <code>report.tar/</code>（只切了 <code>.gz</code>，错了）——这就是选 unar 的理由。</p>
+    </details>
+  </div>
+
+  <div class="footer">
+    <div class="row">
+      <span><a href="0008-custom-commands.html">← 第 7 课 · 自定义命令与快捷键</a></span>
+      <span>番外 · 压缩包与 opener</span>
+      <span><a href="../reference/0002-yazi-opener-reference.html">opener 速查 →</a></span>
+    </div>
+    <p class="source">主源：<a href="https://yazi-rs.github.io/docs/configuration/yazi/" target="_blank" rel="noopener">官方 yazi.toml 文档</a>（v26.5.6，<code>[opener]</code>/<code>[open]</code> 全字段已核实）+ <a href="https://github.com/KKV9/compress.yazi" target="_blank" rel="noopener">compress.yazi README</a>（跨平台、格式表、keymap、PATH 要求）。默认 opener/规则从本机 yazi 二进制内嵌配置核实。<code>w</code>=任务管理器见 yazi 键盘参考。</p>
+    <div class="ask">💡 卡点常见在两处：① <code>unar</code>/<code>zip</code> 没装好（<code>which unar zip</code> 确认）；② <code>c a a</code> 按了没反应（多半是 <code>ya pkg add</code> 后没重启 yazi，或 <code>prepend_keymap</code> 数组少写逗号）。把现象和你的 <code>yazi.toml</code>/<code>keymap.toml</code> 贴我，我帮你查。</div>
+  </div>
+
+</article>
+</body>
+</html>

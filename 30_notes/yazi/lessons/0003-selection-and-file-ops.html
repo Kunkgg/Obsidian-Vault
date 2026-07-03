@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 2 课 · 选择与文件操作</title>
+<link rel="stylesheet" href="../assets/yazi-course.css">
+</head>
+<body>
+<article class="lesson">
+
+  <p class="eyebrow">Yazi 课程 · 第 2 课</p>
+  <h1>选择与文件操作：复制 / 剪切 / 重命名 / 新建 / 删除</h1>
+  <p class="subtitle">按键大多和 vim 一致；但 ranger / lf 的肌肉记忆有几个危险陷阱，必须先纠偏。</p>
+
+  <div class="callout win">
+    <span class="tag">本课的胜利</span>
+    <p>纯键盘完成一次完整操作：选中几个文件 → 复制/剪切到别处粘贴 → 重命名 → 新建目录 → 安全删除。日常文件管理不再需要鼠标或 <code>cp</code>/<code>mv</code>。</p>
+  </div>
+
+  <h2>先选，再操作</h2>
+  <p>yazi 和 vim / ranger / lf 一样：先选中目标，再下命令。</p>
+  <table>
+    <thead><tr><th>键</th><th>动作</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Space</kbd></td><td>选中 / 取消选中当前项</td></tr>
+      <tr><td><kbd>v</kbd></td><td>进入可视模式（区间选择，像 vim 的 <kbd>v</kbd>）</td></tr>
+      <tr><td><kbd>V</kbd></td><td>可视模式（反向：取消区间内的选中）</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>a</kbd></td><td>全选</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>r</kbd></td><td>反选</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>清空选择</td></tr>
+    </tbody>
+  </table>
+  <p>选中的项左侧会有高亮标记。下面所有「复制/剪切/删除」都作用于<strong>当前选中的集合</strong>（没选中时作用于光标所在项）。</p>
+
+  <h2>复制 / 剪切 / 粘贴</h2>
+  <table>
+    <thead><tr><th>键</th><th>动作</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>y</kbd></td><td>复制（yank）选中项</td></tr>
+      <tr><td><kbd>x</kbd></td><td>剪切（cut）选中项</td></tr>
+      <tr><td><kbd>p</kbd></td><td>粘贴；遇同名会跳过</td></tr>
+      <tr><td><kbd>P</kbd></td><td>粘贴；遇同名会<strong>覆盖</strong></td></tr>
+      <tr><td><kbd>Y</kbd> 或 <kbd>X</kbd></td><td>取消当前的复制/剪切状态</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout pitfall">
+    <span class="tag">⚠ 来自 lf / ranger 的致命陷阱</span>
+    <p>在 <strong>lf</strong> 里 <code>d</code> 是「剪切」，在 <strong>ranger</strong> 里 <code>dd</code> 是「剪切」。但在 <strong>yazi</strong> 里，<code>d</code> 是「<strong>删除（进回收站）</strong>」！如果你照 lf/ranger 的习惯按 <kbd>d</kbd> 想剪切，文件会被删掉。</p>
+    <p><strong>记住：yazi 的剪切是 <kbd>x</kbd>，不是 <kbd>d</kbd>。</strong>（钩子：x 像剪刀 ✂ → cut）</p>
+  </div>
+
+  <div class="callout pitfall">
+    <span class="tag">vim 用户的注意</span>
+    <p>vim 里 <code>x</code> 是删一个字符。yazi 里 <code>x</code> 是<strong>剪切整个文件</strong>——完全不同的语义。<code>y</code>（复制）和 <code>p</code>（粘贴）则和 vim 一致，可放心沿用。</p>
+  </div>
+
+  <h2>重命名 / 新建 / 删除</h2>
+  <table>
+    <thead><tr><th>键</th><th>动作</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>r</kbd></td><td>重命名（rename）</td></tr>
+      <tr><td><kbd>a</kbd></td><td>新建；名字以 <code>/</code> 结尾则建目录</td></tr>
+      <tr><td><kbd>d</kbd></td><td>丢进回收站（可恢复）</td></tr>
+      <tr><td><kbd>D</kbd></td><td><strong>永久删除</strong>（不可恢复，慎用）</td></tr>
+      <tr><td><kbd>o</kbd> / <kbd>Enter</kbd></td><td>用默认程序打开</td></tr>
+      <tr><td><kbd>O</kbd></td><td>交互式选择用哪个程序打开</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <span class="tag">小技巧</span>
+    <p><kbd>a</kbd> 新建时，输入 <code>src/</code>（末尾带斜杠）就直接建目录 <code>src</code>；输入 <code>todo.txt</code> 则建文件。<kbd>d</kbd> vs <kbd>D</kbd> 的区别就是「回收站」vs「永久删除」——养成默认用 <kbd>d</kbd> 的习惯，只有确定不要了才 <kbd>D</kbd>。</p>
+  </div>
+
+  <h2>ranger ↔ lf ↔ yazi 对照</h2>
+  <table>
+    <thead><tr><th>动作</th><th>ranger</th><th>lf</th><th>yazi</th></tr></thead>
+    <tbody>
+      <tr><td>复制</td><td><kbd>y</kbd><kbd>y</kbd></td><td><kbd>y</kbd></td><td><kbd>y</kbd></td></tr>
+      <tr><td>剪切</td><td><kbd>d</kbd><kbd>d</kbd></td><td><kbd>d</kbd></td><td><kbd>x</kbd></td></tr>
+      <tr><td>粘贴</td><td><kbd>p</kbd><kbd>p</kbd></td><td><kbd>p</kbd></td><td><kbd>p</kbd></td></tr>
+      <tr><td>重命名</td><td><kbd>c</kbd><kbd>w</kbd></td><td><kbd>c</kbd></td><td><kbd>r</kbd></td></tr>
+      <tr><td>删除</td><td><kbd>d</kbd><kbd>D</kbd></td><td><kbd>D</kbd></td><td><kbd>d</kbd>/<kbd>D</kbd></td></tr>
+    </tbody>
+  </table>
+  <p>规律：ranger 是「双键」、lf 是「单键但 d=剪切」，yazi 是「单键且 <code>x</code>=剪切 / <code>d</code>=删除」。从 lf 迁移最省力，从 ranger 迁移要改掉双键习惯。</p>
+
+  <h2>动手验证（在沙盒里练，安全）</h2>
+  <p>我已经在 <code>~/yazi-practice/</code> 建了几个假文件（<code>a.txt b.txt c.txt notes.md</code> + <code>sub/</code>）。在这里随便折腾：</p>
+  <div class="callout verify">
+    <span class="tag">跟着做</span>
+    <ol class="steps">
+      <li><code>y</code> 启动，导航进 <code>~/yazi-practice</code>（或先 <code>cd ~/yazi-practice && y</code>）。</li>
+      <li>光标停在 <code>a.txt</code>，按 <kbd>Space</kbd>；移到 <code>b.txt</code>，再 <kbd>Space</kbd> —— 两个都被选中。</li>
+      <li>按 <kbd>y</kbd> 复制；进 <code>sub/</code>（<kbd>l</kbd>），按 <kbd>p</kbd> 粘贴 → <code>sub</code> 里多了两份。</li>
+      <li>退回上级，光标到 <code>c.txt</code>，按 <kbd>r</kbd> 改名为 <code>c.md</code>。</li>
+      <li>按 <kbd>a</kbd>，输入 <code>draft/</code> 回车 → 新建目录 <code>draft</code>。</li>
+      <li>选中任意一份副本，按 <kbd>d</kbd> → 进回收站（列表里消失）。想确认能恢复，去 <code>~/.local/share/Trash</code> 看。</li>
+      <li><kbd>Esc</kbd> 清空选择。</li>
+    </ol>
+  </div>
+
+  <div class="quiz">
+    <span class="tag">检索练习 · 先想再点开（答案都是单键）</span>
+    <p>1. 复制（yank）选中文件？</p>
+    <p>2. 剪切（cut）选中文件？</p>
+    <p>3. 粘贴？</p>
+    <p>4. 丢进回收站？</p>
+    <p>5. 重命名？</p>
+    <p>6. 新建（末尾 <code>/</code> 建目录）？</p>
+    <details><summary>看答案</summary>
+    <p>1. <kbd>y</kbd>　2. <kbd>x</kbd>　3. <kbd>p</kbd>　4. <kbd>d</kbd>　5. <kbd>r</kbd>　6. <kbd>a</kbd></p>
+    <p>两个钩子：<strong>x 像剪刀=cut</strong>；<strong>d=delete=回收站</strong>（lf 用户尤其别把 d 当剪切）。</p>
+    </details>
+  </div>
+
+  <h2>下一步</h2>
+  <p>单文件操作会了，下一课上「批量」：多选后<strong>批量改名</strong>（用 <code>$EDITOR</code> 一次改一列），以及<strong>批量拷贝路径/文件名</strong>到剪贴板（<kbd>c</kbd><kbd>c</kbd>/<kbd>c</kbd><kbd>d</kbd>/<kbd>c</kbd><kbd>f</kbd>/<kbd>c</kbd><kbd>n</kbd>）——这对你在项目里复制文件名/路径特别有用。</p>
+
+  <div class="footer">
+    <div class="row">
+      <span><a href="0002-core-navigation.html">← 第 1 课 · 核心导航</a></span>
+      <span>第 2 / 8 课</span>
+      <span><a href="0004-bulk-rename-and-paths.html">第 3 课 · 批量改名与拷路径 →</a></span>
+    </div>
+    <p class="source">主源：<a href="https://yazi-rs.github.io/docs/quick-start/#file-operations" target="_blank" rel="noopener">官方 Quick Start · Selection / File operations</a>。</p>
+    <div class="ask">💡 练的时候任何不顺手都来问我——尤其 lf/ranger 习惯冲突的地方，我帮你针对性纠偏。</div>
+  </div>
+
+</article>
+</body>
+</html>

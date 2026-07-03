@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 0 课 · 让 Yazi 跑起来 + y 跳转</title>
+<link rel="stylesheet" href="../assets/yazi-course.css">
+</head>
+<body>
+<article class="lesson">
+
+  <p class="eyebrow">Yazi 课程 · 第 0 课</p>
+  <h1>让 Yazi 跑起来，并用 <code>y</code> 跳转目录</h1>
+  <p class="subtitle">安装只是一次性动作；<code>y</code> wrapper 才是你以后每天都会用的东西。</p>
+
+  <div class="callout win">
+    <span class="tag">本课的胜利</span>
+    <p>敲 <kbd>y</kbd> 启动 yazi，导航进某个目录，按 <kbd>q</kbd> 退出 —— 你的 shell 已经自动 <code>cd</code> 到了那个目录。从此 yazi 就是你的「可视化的 <code>cd</code>」。</p>
+  </div>
+
+  <h2>我们装了什么</h2>
+  <p>官方把 yazi 编译成两套 Linux 二进制：<strong>GNU</strong>（依赖系统 glibc）和 <strong>Musl</strong>（静态链接，不依赖 glibc）。你的 WSL 是 Ubuntu 22.04，自带 <strong>glibc 2.35</strong>，而新版 yazi 的 GNU 构建要求 glibc ≥ 2.39 —— 所以之前 apt 装的那个一跑就崩（<code>GLIBC_2.39 not found</code>）。</p>
+  <p>解法：用 <strong>musl</strong> 构建，它把 C 库打包进二进制，在任何 Linux 上都能跑。我们把 <code>v26.5.6</code> 的 musl 版装到了 <code>~/.local/bin/</code>：</p>
+  <ul>
+    <li><code>yazi</code> —— 文件管理器本体</li>
+    <li><code>ya</code> —— 命令行助手，以后装插件、补全全靠它</li>
+  </ul>
+
+  <div class="callout win">
+    <span class="tag">已清理</span>
+    <p>原先坏的 apt 包（<code>/usr/bin/yazi</code>）已用 <code>sudo apt remove yazi</code> 删除。现在 <code>yazi</code> 全局唯一指向 <code>~/.local/bin/</code> 里的 musl 版，无歧义。</p>
+  </div>
+
+  <h2><code>y</code> wrapper：退出即跳转</h2>
+  <p>这是本课的核心。默认情况下，从 yazi 退出<strong>不会</strong>改变你 shell 的工作目录 —— 你用 ranger / lf 大概也踩过这点：浏览了半天，退出后还在原地。yazi 用一个小技巧解决了它：</p>
+  <ol>
+    <li>启动时给 yazi 一个临时文件路径（<code>--cwd-file</code>）；</li>
+    <li>退出时，yazi 把「你最后所在的目录」写进这个文件；</li>
+    <li>shell 读出来，替你 <code>cd</code> 过去。</li>
+  </ol>
+  <p>下面这个函数把三步打包好，我已经追加进了你的 <code>~/.zshrc</code>：</p>
+  <pre><code>function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+	command rm -f -- "$tmp"
+}</code></pre>
+  <p>注意里面是 <code>command yazi</code>（避免函数递归调用自己），以及最后只在新目录与当前不同、且确实存在时才 <code>cd</code>。</p>
+
+  <h2>动手验证（你的反馈回路）</h2>
+  <div class="callout verify">
+    <span class="tag">跟着做一遍</span>
+    <ol class="steps">
+      <li>让新配置生效：<code>exec zsh</code>（或 <code>source ~/.zshrc</code>）。</li>
+      <li>敲 <kbd>y</kbd> 启动 yazi。</li>
+      <li>用 <kbd>l</kbd> 进入一个子目录（比如 <code>Repos</code>），再 <kbd>l</kbd> 进一层。</li>
+      <li>按 <kbd>q</kbd> 退出。</li>
+      <li>敲 <code>pwd</code> —— 应该显示你刚才所在的那个目录。✅</li>
+    </ol>
+    <p>再试一次，但这次用 <kbd>Q</kbd>（大写）退出：<code>pwd</code> 应<strong>不变</strong>。这就是「想跳就 <kbd>q</kbd>，不想跳就 <kbd>Q</kbd>」。</p>
+  </div>
+
+  <div class="quiz">
+    <span class="tag">检索练习 · 先别看答案</span>
+    <p>退出 yazi 时，想让 shell 跟着跳到所在目录，按哪个键？不想跳呢？</p>
+    <details><summary>看答案</summary>
+    <p>想跳按 <kbd>q</kbd>；不想跳按 <kbd>Q</kbd>。这个差别来自 wrapper 函数本身——它总是 <code>cd</code>，但 yazi 在按 <kbd>Q</kbd> 时不会写出新的 cwd，于是 <code>$PWD</code> 保持不变。</p>
+    </details>
+  </div>
+
+  <h2>下一步</h2>
+  <p>yazi 已经能用、也能跳转了。下一课我们正式练<strong>核心导航</strong>（<kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd>、<kbd>g</kbd><kbd>g</kbd>、<kbd>G</kbd>、<kbd>z</kbd>、<kbd>Z</kbd>），并把你在 ranger / lf 里的肌肉记忆迁移过来。</p>
+
+  <div class="footer">
+    <div class="row">
+      <span>第 0 / 8 课</span>
+      <span><a href="0002-core-navigation.html">第 1 课 · 核心导航 →</a></span>
+    </div>
+    <p class="source">主源（推荐阅读）：<a href="https://yazi-rs.github.io/docs/quick-start/" target="_blank" rel="noopener">官方 Quick Start · Shell wrapper &amp; Keybindings</a>。安装细节见 <a href="https://yazi-rs.github.io/docs/installation/" target="_blank" rel="noopener">Installation</a>。</p>
+    <div class="ask">💡 有任何不清楚的地方，直接问我（你的 agent 老师）——比如想搞懂 wrapper 函数里某一行的意思，或者 musl/glibc 的细节。</div>
+  </div>
+
+</article>
+</body>
+</html>

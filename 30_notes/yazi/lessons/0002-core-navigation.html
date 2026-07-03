@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 1 课 · 核心导航</title>
+<link rel="stylesheet" href="../assets/yazi-course.css">
+</head>
+<body>
+<article class="lesson">
+
+  <p class="eyebrow">Yazi 课程 · 第 1 课</p>
+  <h1>核心导航：<code>hjkl</code>、<code>gg</code>、<code>G</code>、<code>z</code>、<code>Z</code></h1>
+  <p class="subtitle">好消息：八成的键和 ranger / lf / vim 一模一样。重点是 yazi 独有的两个跳转键。</p>
+
+  <div class="callout win">
+    <span class="tag">本课的胜利</span>
+    <p>纯键盘在目录树里上下穿梭，进出自如；并且能用 <kbd>Z</kbd> 一键瞬移到你常用的项目目录。</p>
+  </div>
+
+  <h2>四个移动键（和 vim / ranger / lf 完全一致）</h2>
+  <table>
+    <thead><tr><th>键</th><th>动作</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>h</kbd></td><td>回到上一级父目录</td></tr>
+      <tr><td><kbd>l</kbd></td><td>进入光标所在的子目录</td></tr>
+      <tr><td><kbd>j</kbd></td><td>光标下移一项</td></tr>
+      <tr><td><kbd>k</kbd></td><td>光标上移一项</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <span class="tag">肌肉记忆迁移</span>
+    <p>你 ranger / lf 里这套手感<strong>直接照搬</strong>就行。方向键 <kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd> 也同样可用，但既然你熟 vim，就别退回方向键了。</p>
+  </div>
+
+  <h2>列表内大跳</h2>
+  <table>
+    <thead><tr><th>键</th><th>动作</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>g</kbd> <kbd>g</kbd></td><td>跳到列表最顶端（先 <kbd>g</kbd> 再 <kbd>g</kbd>）</td></tr>
+      <tr><td><kbd>G</kbd></td><td>跳到列表最底端</td></tr>
+    </tbody>
+  </table>
+
+  <h2>大写 <kbd>J</kbd> / <kbd>K</kbd>：滚的是预览，不是列表</h2>
+  <table>
+    <thead><tr><th>键</th><th>动作</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>K</kbd></td><td>在右侧<strong>预览窗</strong>里向上滚动 5 行</td></tr>
+      <tr><td><kbd>J</kbd></td><td>在右侧<strong>预览窗</strong>里向下滚动 5 行</td></tr>
+    </tbody>
+  </table>
+  <div class="callout pitfall">
+    <span class="tag">易混点</span>
+    <p>小写 <kbd>j</kbd><kbd>k</kbd> 移动的是<strong>文件列表</strong>里的光标；大写 <kbd>J</kbd><kbd>K</kbd> 滚动的是<strong>预览内容</strong>。当你预览一个长文件、想看下面的内容时，就用大写 <kbd>J</kbd>。这是 yazi 一个顺手的小设计，ranger/lf 里没有对应物。</p>
+  </div>
+
+  <h2>两个跳转键（yazi 的杀手锏）</h2>
+  <p>这是「快速跳转目录」的核心。普通移动靠 <kbd>h</kbd><kbd>l</kbd>，但跨越大目录树就得靠这两个：</p>
+  <table>
+    <thead><tr><th>键</th><th>动作</th><th>底层</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>z</kbd></td><td>模糊跳转：输几个字母匹配目录</td><td>fzf（按当前目录扫描）</td></tr>
+      <tr><td><kbd>Z</kbd></td><td>常用度跳转：瞬移到你最常去的目录</td><td>zoxide（按访问频率）</td></tr>
+      <tr><td><kbd>g</kbd> <kbd>Space</kbd></td><td>交互式输入路径跳转</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <span class="tag">刚才发生了什么</span>
+    <p>我发现你的 zoxide 装了却<strong>没接进 shell</strong>（db 是空的），所以 <kbd>Z</kbd> 本来是死的。我已经做了两件事：① 在 <code>.zshrc</code> 加了 <code>eval "$(zoxide init zsh)"</code>，于是 shell 里有了 <code>z</code> 命令；② 往 zoxide 喂了 <code>~</code>、<code>~/Repos</code>、<code>~/Repos/matt_skill_test</code> 三个真实目录，让 <kbd>Z</kbd> 现在就能用。</p>
+    <p><strong>让它越用越聪明</strong>：以后在 shell 里多用 <code>z &lt;目录片段&gt;</code> 代替 <code>cd</code>，zoxide 会记住你常去的地方，<kbd>Z</kbd> 就会把最常用的顶到最前面。</p>
+  </div>
+
+  <h2>动手验证</h2>
+  <div class="callout verify">
+    <span class="tag">在你的机器上跑一遍</span>
+    <ol class="steps">
+      <li><code>exec zsh</code>（让 zoxide 和 <code>y</code> 都生效）。</li>
+      <li><code>cd ~ && y</code> 从家目录启动。</li>
+      <li><kbd>l</kbd> 进入 <code>Repos</code>，再 <kbd>l</kbd> 进入 <code>matt_skill_test</code>；然后 <kbd>h</kbd> <kbd>h</kbd> 退回 家目录。</li>
+      <li><kbd>g</kbd><kbd>g</kbd> 到顶，<kbd>G</kbd> 到底，感受大跳。</li>
+      <li>按 <kbd>z</kbd>，输入 <code>matt</code>，回车 —— 模糊跳进 <code>matt_skill_test</code>。</li>
+      <li>按 <kbd>Z</kbd>，看到 zoxide 列出的目录，选一个回车 —— 瞬移过去。</li>
+      <li><kbd>q</kbd> 退出，<code>pwd</code> 应显示你最后所在的目录（第 0 课的 <code>y</code> 在收尾）。</li>
+    </ol>
+  </div>
+
+  <div class="quiz">
+    <span class="tag">检索练习 · 先想再点开</span>
+    <p>1. 用 fzf 模糊跳转目录，按哪个键？</p>
+    <p>2. 用 zoxide 按常用度跳转，按哪个键？</p>
+    <p>3. 进入光标所在的子目录，按哪个键？</p>
+    <p>4. 回到上一级父目录，按哪个键？</p>
+    <details><summary>看答案</summary>
+    <p>1. <kbd>z</kbd>　　2. <kbd>Z</kbd>　　3. <kbd>l</kbd>　　4. <kbd>h</kbd></p>
+    <p>记忆钩子：<strong>小写看当前目录（fzf 扫描当下），大写看全局历史（zoxide 记住你常去的）</strong>。</p>
+    </details>
+  </div>
+
+  <h2>下一步</h2>
+  <p>导航搞定后，下一课进入<strong>文件操作</strong>：选择（<kbd>Space</kbd>、<kbd>v</kbd>）、复制/剪切/粘贴/重命名/新建/删除（<kbd>y</kbd> <kbd>x</kbd> <kbd>p</kbd> <kbd>r</kbd> <kbd>a</kbd> <kbd>d</kbd>）。</p>
+
+  <div class="footer">
+    <div class="row">
+      <span><a href="0001-install-and-y-wrapper.html">← 第 0 课 · 安装 + y wrapper</a></span>
+      <span>第 1 / 8 课</span>
+      <span><a href="0003-selection-and-file-ops.html">第 2 课 · 选择与文件操作 →</a></span>
+    </div>
+    <p class="source">主源：<a href="https://yazi-rs.github.io/docs/quick-start/#navigation" target="_blank" rel="noopener">官方 Quick Start · Navigation / Find / Search</a>。zoxide 用法见 <a href="https://github.com/ajeetdsouza/zoxide" target="_blank" rel="noopener">zoxide 文档</a>。</p>
+    <div class="ask">💡 不清楚就问：比如 <kbd>z</kbd> 和 <kbd>Z</kbd> 弹出的界面怎么操作、zoxide 的「常用度」怎么算的，或者想把某个项目也喂进 zoxide。</div>
+  </div>
+
+</article>
+</body>
+</html>

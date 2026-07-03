@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yazi Opener 速查</title>
+<link rel="stylesheet" href="../assets/yazi-course.css">
+</head>
+<body>
+<article class="lesson">
+
+  <p class="eyebrow">Yazi · 参考文档 0002</p>
+  <h1>Opener / Open 速查表</h1>
+  <p class="subtitle">「按回车时 yazi 跑什么」的全部规则。打印一张贴旁边。</p>
+
+  <div class="callout">
+    <span class="tag">两层结构（一句话）</span>
+    <p><code>[opener]</code> 定义「能做什么菜」（命名命令）→ <code>[open]</code> 决定「什么食材走哪道菜」（匹配规则）。都写在 <code>yazi.toml</code>。</p>
+  </div>
+
+  <h2>[opener] · 命名命令</h2>
+  <pre><code>[opener]
+edit    = [ { run = "${EDITOR:-vi} %s", desc = "$EDITOR", for = "unix", block = true } ]
+extract = [ { run = "ya pub extract --list %s", desc = "Extract here" } ]
+unpack  = [ { run = "unar %s", desc = "解压到同名子目录", for = "unix" },
+            { run = "unar %s", desc = "解压到同名子目录", for = "windows" } ]
+play    = [ { run = "mpv %s", orphan = true, for = "unix" } ]</code></pre>
+  <p>每个 opener 是<strong>数组</strong>——可按 <code>for</code> 给不同 OS 不同命令（同键跨平台）。同名 key（如自定义 <code>extract</code>）<strong>覆盖</strong>默认。</p>
+  <table>
+    <thead><tr><th>字段</th><th>作用</th></tr></thead>
+    <tbody>
+      <tr><td><code>run</code></td><td>命令。见下表模板参数</td></tr>
+      <tr><td><code>block</code></td><td>接管屏幕跑交互程序（编辑器/REPL），退出回 yazi</td></tr>
+      <tr><td><code>orphan</code></td><td>后台 detach，yazi 退了也活着（播放器/GUI）</td></tr>
+      <tr><td><code>desc</code></td><td>「Open with」菜单里的说明</td></tr>
+      <tr><td><code>for</code></td><td>限定 OS：<code>unix</code>(Linux+macOS) / <code>linux</code> / <code>macos</code> / <code>windows</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3><code>run</code> 里的模板参数</h3>
+  <table>
+    <thead><tr><th>写法</th><th>替换成</th></tr></thead>
+    <tbody>
+      <tr><td><code>%s</code></td><td>所有选中文件的路径</td></tr>
+      <tr><td><code>%s1</code> <code>%s2</code></td><td>第 1、2 个选中文件</td></tr>
+      <tr><td><code>%S</code> <code>%SN</code></td><td>同上，但 URL 编码形式</td></tr>
+      <tr><td><code>%d</code> <code>%dN</code></td><td>选中文件所在目录</td></tr>
+      <tr><td><code>%%</code></td><td>字面 <code>%</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>[open] · 匹配规则</h2>
+  <pre><code>[open]
+prepend_rules = [
+  { url = "*.json", use = "edit" },                       # 按扩展名（url 是 glob）
+  { url = "*.html", use = ["open", "edit"] },             # 数组→合并：open 跑第 1 个，o 弹菜单列全部
+  { mime = "video/*", use = "play" },                     # 按 MIME
+  { mime = "application/{zip,rar,7z*}", use = ["unpack", "extract", "reveal"] },
+]
+# rules = [ ... ]   # 彻底重写（少用）</code></pre>
+  <table>
+    <thead><tr><th>字段</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td><code>url</code></td><td>路径/文件名 glob，默认大小写不敏感；前缀 <code>\s</code> 变敏感</td></tr>
+      <tr><td><code>mime</code></td><td>MIME 类型 glob（同上大小写规则）</td></tr>
+      <tr><td><code>use</code></td><td>opener 名，或名数组。数组时 <code>open</code> 跑第一个，<code>open --interactive</code>（<kbd>o</kbd>）列全部</td></tr>
+    </tbody>
+  </table>
+
+  <h2>混合机制（叠加 / 覆盖）</h2>
+  <ul>
+    <li><code>prepend_rules</code> / <code>append_rules</code>：在默认规则<strong>前/后</strong>插。yazi 用<strong>第一条匹配</strong>→ prepend 常用来「抢在默认前」改某类文件的行为。</li>
+    <li><code>append_rules</code> 里带通配符 <code>*</code> 的会<strong>优先于</strong>默认通配符兜底。</li>
+    <li><code>[opener]</code> 同名 key（如 <code>extract</code>）直接覆盖默认那个 opener。</li>
+    <li>同款 <code>prepend_*</code> 套路也用于：<code>fetchers</code> / <code>previewers</code> / <code>preloaders</code> / <code>keymap</code>（第 6 课讲过）。</li>
+  </ul>
+
+  <div class="callout pitfall">
+    <span class="tag">查真实 MIME</span>
+    <p>写 <code>mime</code> 规则前，先确认文件的实际类型：光标停文件上按 <kbd>Tab</kbd>（<code>spot</code>）→ 看到 yazi 判定的 mime，照抄。</p>
+  </div>
+
+  <h2>yazi 自带的默认 opener（从二进制核实，v26.5.6）</h2>
+  <ul>
+    <li><code>edit</code> → <code>${EDITOR:-vi} %s</code>（block）</li>
+    <li><code>extract</code> → <code>ya pub extract --list %s</code>（解压到<strong>当前目录</strong>；走 yazi 内建逻辑，桥接 7zz）</li>
+    <li><code>open</code> → 系统默认 opener（<code>xdg-open</code> / <code>start</code> / <code>open</code>）</li>
+    <li><code>reveal</code> → 在父目录里选中（不打开）</li>
+  </ul>
+  <p>默认 <code>[open]</code> 已给压缩包配好：<code>{ mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", use = ["extract", "reveal"] }</code>。所以「按 <kbd>l</kbd>/<kbd>o</kbd> 解压」开箱就有——只是它解到 <strong>CWD</strong>。</p>
+
+  <div class="footer">
+    <div class="row">
+      <span><a href="../lessons/0009-openers-and-archives.html">← 第 8 课 · 压缩包与 opener</a></span>
+      <span>参考文档 0002 · opener/open</span>
+      <span><a href="0001-yazi-config-reference.html">配置总速查 →</a></span>
+    </div>
+    <p class="source">主源：<a href="https://yazi-rs.github.io/docs/configuration/yazi/" target="_blank" rel="noopener">官方 yazi.toml 文档</a>（v26.5.6，已逐条核实 <code>[opener]</code>/<code>[open]</code> 字段、模板参数、混合机制）。默认 opener 表从本机 yazi 二进制内嵌配置核实。</p>
+  </div>
+
+</article>
+</body>
+</html>

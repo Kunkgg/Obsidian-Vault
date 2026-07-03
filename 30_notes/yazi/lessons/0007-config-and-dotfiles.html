@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 6 课 · 配置与跨平台同步</title>
+<link rel="stylesheet" href="../assets/yazi-course.css">
+</head>
+<body>
+<article class="lesson">
+
+  <p class="eyebrow">Yazi 课程 · 第 6 课</p>
+  <h1>配置与跨平台同步</h1>
+  <p class="subtitle">把第 5 课写好的 3 个配置文件变成一个 git 仓库——WSL 改一处、push，Windows / Mac / Linux pull 一下就是同一套 yazi。零 symlink、零环境变量。</p>
+
+  <div class="callout win">
+    <span class="tag">本课的胜利</span>
+    <p>把 <code>~/.config/yazi/</code> 变成一个 git 仓库并推到远端；在 Windows 上 clone 进它自己的配置目录，两端就是同一份配置。以后任何一台改了配置 → <code>git push</code>，其余机器 <code>git pull</code>。这是 mission 里「跨机器同步配置」的最省事做法。</p>
+  </div>
+
+  <h2>先搞懂 · 4 个配置文件各管什么</h2>
+  <p>yazi 的配置全是<strong>可选</strong>——它自带一套完整默认配置（见 <a href="https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset" target="_blank" rel="noopener">仓库 <code>shipped</code> tag</a>），你只写「想改的那部分」。四个文件：</p>
+  <table>
+    <thead><tr><th>文件</th><th>管什么</th><th>你已碰过？</th></tr></thead>
+    <tbody>
+      <tr><td><code>yazi.toml</code></td><td>行为与功能：显示隐藏文件、排序、<code>[plugin]</code> 下的 fetcher/预览器等</td><td>✅ 第 5 课加了 <code>prepend_fetchers</code></td></tr>
+      <tr><td><code>keymap.toml</code></td><td>按键绑定</td><td>✅ 第 5 课加了 <code>[mgr] prepend_keymap</code></td></tr>
+      <tr><td><code>init.lua</code></td><td>Lua 入口，给插件调 <code>setup()</code></td><td>✅ 第 5 课写了 <code>require("simple-tag"):setup({})</code></td></tr>
+      <tr><td><code>theme.toml</code></td><td>配色</td><td>本课不碰，知道有这文件即可</td></tr>
+    </tbody>
+  </table>
+
+  <h2>配置「混合」机制：prepend / append</h2>
+  <p>这是第 5 课你已经在用、但还没点破的关键概念。写 <code>yazi.toml</code> / <code>keymap.toml</code> 时，<strong>同名选项会覆盖默认</strong>。但你想在默认之<strong>上</strong>叠加自己的，就用 <code>prepend_*</code> / <code>append_*</code> 把条目插到默认的前面或后面，<strong>不抹掉默认</strong>。</p>
+  <pre><code># keymap.toml —— 在默认按键之上"加"自己的（不覆盖默认）
+[mgr]
+prepend_keymap = [
+  { on = [ "t", "g" ], run = "plugin simple-tag -- toggle-tag" },
+  # ...
+]</code></pre>
+  <p>第 5 课的 <code>prepend_keymap</code>（加按键）和 <code>prepend_fetchers</code>（加标签徽章 fetcher）都是这个机制——所以你加了标签键，却没丢掉 <kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd> 这些默认键。官方说明它对 <strong>keymap、fetchers、open / icon / previewer / preloader 规则</strong>都适用。</p>
+  <div class="callout">
+    <span class="tag">一句话记忆</span>
+    <p>想<strong>改掉</strong>默认 → 直接写同名选项（覆盖）；想<strong>在默认之上加</strong> → 用 <code>prepend_*</code> / <code>append_*</code>。99% 的自定义用 <code>prepend_*</code>。</p>
+  </div>
+
+  <h2>跨平台的关键</h2>
+  <p>两个平台，两个默认目录（<a href="https://yazi-rs.github.io/docs/configuration/overview/" target="_blank" rel="noopener">官方 Configuration 文档已核实</a>）：</p>
+  <ul>
+    <li><strong>Unix</strong>（WSL / Mac / Linux）：<code>~/.config/yazi/</code></li>
+    <li><strong>Windows</strong>：<code>%AppData%\yazi\config\</code>（即 <code>C:\Users\&lt;你&gt;\AppData\Roaming\yazi\config\</code>）</li>
+  </ul>
+  <div class="callout pitfall">
+    <span class="tag">目录名不同，但文件完全通用</span>
+    <p>这两个目录里的文件都是 <strong>TOML / Lua 纯文本，没有任何平台差异</strong>。所以「同步」= 让四台机器的这个目录里装<strong>同一批文件</strong>。难点只在「目录路径不一样」——下面用 git 直接绕过它。</p>
+  </div>
+  <div class="callout verify">
+    <span class="tag">备选知识 · YAZI_CONFIG_HOME</span>
+    <p>yazi 官方支持 <code>YAZI_CONFIG_HOME</code> 环境变量改配置目录（例：<code>YAZI_CONFIG_HOME=~/.config/yazi-alt yazi</code>）。本课<strong>不用它</strong>——直接在默认目录里 git，连环境变量都省了。<code>YAZI_CONFIG_HOME</code> 留作「想把 yazi 配置塞进一个统一 dotfiles 大仓库」时的备选（见页脚问我）。</p>
+  </div>
+
+  <h2>动手 · 把配置变成 git 仓库（以 WSL 为主）</h2>
+  <div class="callout verify">
+    <span class="tag">跟着做</span>
+    <ol class="steps">
+      <li><strong>进配置目录，建 git 仓库 + <code>.gitignore</code></strong>（排除每机本地的插件和标签数据）：
+        <pre><code>cd ~/.config/yazi
+git init
+printf 'plugins/\ntags/\n' > .gitignore</code></pre>
+        <p><code>plugins/</code> 是 <code>ya pkg add</code> 装的第三方插件（每机一行命令重装即可）；<code>tags/</code> 是标签数据（按绝对路径存，跨机器不通用，见下方）。入库的只有<strong>你写的</strong> <code>yazi.toml</code> / <code>keymap.toml</code> / <code>init.lua</code>（和可选的 <code>theme.toml</code>）。</p>
+      </li>
+      <li><strong>提交 + 推到远端</strong>。先在 GitHub 建一个空仓库 <code>yazi-config</code>，然后：
+        <pre><code>git add -A
+git commit -m "yazi config"
+git remote add origin git@github.com:你的用户名/yazi-config.git
+git branch -M main
+git push -u origin main</code></pre>
+      </li>
+      <li><strong>Windows 上拿同一份</strong>。Windows 的默认配置目录就是 <code>%AppData%\yazi\config\</code>，直接 clone 进去（第 5 课你已配过，先备份再覆盖）：
+        <pre><code># PowerShell
+Move-Item "$env:APPDATA\yazi\config" "$env:APPDATA\yazi\config.bak"
+git clone git@github.com:你的用户名/yazi-config.git "$env:APPDATA\yazi\config"
+ya pkg add boydaihungst/simple-tag   # 重装插件（plugins/ 没入库）</code></pre>
+        <p>Mac / 干净 Linux 同理：clone 进 <code>~/.config/yazi/</code>，再 <code>ya pkg add boydaihungst/simple-tag</code>。</p>
+      </li>
+      <li><strong>验证两端一致</strong>：Windows 启 yazi，<kbd>t</kbd><kbd>g</kbd> 能打标签、<kbd>t</kbd><kbd>f</kbd> 能筛选 → 配置已同步。以后 WSL 改配置 → <code>git push</code>，Windows → <code>cd %AppData%\yazi\config && git pull</code>，齐了。</li>
+    </ol>
+  </div>
+  <div class="callout pitfall">
+    <span class="tag">clone 后必须重装插件</span>
+    <p><code>plugins/</code> 被 gitignore 了，clone 下来的新机<strong>没有</strong> <code>simple-tag</code>。若不跑 <code>ya pkg add</code>，<code>init.lua</code> 里的 <code>require("simple-tag")</code> 找不到插件，yazi 启动会报错。所以「clone + <code>ya pkg add</code>」是每台新机的固定两步。</p>
+  </div>
+
+  <h2>为什么标签不跟着同步</h2>
+  <div class="callout">
+    <span class="tag">复习第 5 课查实的事实</span>
+    <p>标签存在 <code>tags/</code> 目录里，键是<strong>被标文件的父目录绝对路径</strong>。WSL 是 <code>/home/...</code>、Windows 是 <code>C:\Users\...</code>——<strong>键不同，标签不能跨机器 / 跨 OS 迁移</strong>。所以上面 <code>.gitignore</code> 排掉 <code>tags/</code>，标签视作每机本地；dotfiles 只搬配置文件。详见 <a href="../learning-records/0004-lesson5-tags-verified-and-storage.md">学习记录 0004</a>。</p>
+  </div>
+
+  <h2>跨平台注意 · 搜索依赖</h2>
+  <div class="callout pitfall">
+    <span class="tag">clone 配置不够，搜索工具也要装</span>
+    <p><kbd>s</kbd>（按名搜索）依赖 <code>fd</code> 或 <code>fdfind</code>。这台 WSL 有 <code>fdfind</code>（yazi 自动回退）能用；Mac 用 <code>brew install fd</code>；但一台<strong>两者都没装</strong>的干净 Linux / 容器上 <kbd>s</kbd> 会失效——clone 了配置还得补装 <code>fd</code>。<kbd>S</kbd>（内容搜索）靠 <code>ripgrep</code>（<code>rg</code>），同理。详见 <a href="../learning-records/0003-lesson4-s-search-fdfind-fallback.md">学习记录 0003</a>。</p>
+  </div>
+
+  <div class="quiz">
+    <span class="tag">检索练习</span>
+    <p>1. 想在默认按键之上「加」自己的键（不覆盖默认），<code>keymap.toml</code> 里用哪个关键字开头？</p>
+    <p>2. WSL 和 Windows 的 yazi 默认配置目录分别是？</p>
+    <p>3. 为什么 <code>tags/</code> 不入库、标签不能跨机器带走？</p>
+    <p>4. 在新机器 clone 完配置后，还必须跑哪条命令，标签功能才不会启动报错？</p>
+    <details><summary>看答案</summary>
+    <p>1. <code>prepend_</code>（如 <code>prepend_keymap</code>；想追加在后用 <code>append_</code>）。</p>
+    <p>2. <code>~/.config/yazi/</code>（Unix）与 <code>%AppData%\yazi\config\</code>（Windows）。</p>
+    <p>3. 标签按「被标文件的父目录绝对路径」存；WSL 的 <code>/home/...</code> 与 Windows 的 <code>C:\Users\...</code> 键不同，跨机器 / 跨 OS 不互通。</p>
+    <p>4. <code>ya pkg add boydaihungst/simple-tag</code>（<code>plugins/</code> 被 gitignore，每机要重装）。</p>
+    </details>
+  </div>
+
+  <h2>下一步</h2>
+  <p>下一课<strong>自定义命令与快捷键</strong>：在 <code>keymap.toml</code> 里绑自己的键、把常用的「组合动作」做成一个命令，让 yazi 真正长成你的工作流。今天搭好的 git 仓库会让那节课的改动自动同步到所有机器。</p>
+
+  <div class="footer">
+    <div class="row">
+      <span><a href="0006-file-tags.html">← 第 5 课 · 文件标签</a></span>
+      <span>第 6 / 8 课</span>
+      <span><a href="0008-custom-commands.html">第 7 课 · 自定义命令与快捷键 →</a></span>
+    </div>
+    <p class="source">主源：<a href="https://yazi-rs.github.io/docs/configuration/overview/" target="_blank" rel="noopener">官方 Configuration 文档</a>（v26.5.6，已逐条核实：四个配置文件、<code>prepend_*</code>/<code>append_*</code> 混合机制、Unix / Windows 配置目录、<code>YAZI_CONFIG_HOME</code> 环境变量）、<a href="https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset" target="_blank" rel="noopener">默认配置（shipped tag）</a>。标签存储位置见 <a href="../learning-records/0004-lesson5-tags-verified-and-storage.md">学习记录 0004</a>。</p>
+    <div class="ask">💡 这节课的卡点多半在 git 远端（SSH key、仓库权限）或 Windows 上 clone 路径拼错。把 <code>git push</code> 或 Windows 启动 yazi 的报错连同现象贴我，我帮你查。两端都能 <kbd>t</kbd><kbd>g</kbd> 打标签，这节课就成了。</div>
+  </div>
+
+  <p style="margin-top:2rem;"><a href="../reference/0001-yazi-config-reference.html">📋 配置速查表（参考文档）</a> —— 四个文件 + prepend/append + 目录/env 速查，可打印。</p>
+
+</article>
+</body>
+</html>

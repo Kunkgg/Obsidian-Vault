@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yazi 配置速查表</title>
+<link rel="stylesheet" href="../assets/yazi-course.css">
+<style>
+  .lesson { max-width: 760px; }
+  .ref-grid { display:grid; grid-template-columns: 1fr; gap:0; }
+</style>
+</head>
+<body>
+<article class="lesson">
+
+  <p class="eyebrow">参考文档 · 可打印</p>
+  <h1>Yazi 配置速查表</h1>
+  <p class="subtitle">四个配置文件、混合机制、跨平台目录与环境变量——一张表查清。配套：<a href="../lessons/0007-config-and-dotfiles.html">第 6 课</a>。</p>
+
+  <h2>配置文件</h2>
+  <table>
+    <thead><tr><th>文件</th><th>管什么</th><th>备注</th></tr></thead>
+    <tbody>
+      <tr><td><code>yazi.toml</code></td><td>行为/功能：显示隐藏、排序、<code>[plugin]</code> 的 fetcher / previewer 等</td><td>段名 <code>[mgr]</code>（v25+，旧 <code>[manager]</code> 已废）</td></tr>
+      <tr><td><code>keymap.toml</code></td><td>按键绑定</td><td>层名 <code>[mgr]</code>；键 <code>on = ["t","g"]</code> 数组</td></tr>
+      <tr><td><code>init.lua</code></td><td>Lua 入口，插件 <code>setup()</code></td><td>插件必需，哪怕 <code>setup({})</code> 空表</td></tr>
+      <tr><td><code>theme.toml</code></td><td>配色</td><td>可不管，用默认</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <span class="tag">原则</span>
+    <p>四个文件<strong>都可选</strong>。yazi 自带完整默认（<a href="https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset" target="_blank" rel="noopener">shipped tag</a>），你只写「想改的那部分」。</p>
+  </div>
+
+  <h2>混合机制：覆盖 vs 叠加</h2>
+  <table>
+    <thead><tr><th>写法</th><th>效果</th><th>何时用</th></tr></thead>
+    <tbody>
+      <tr><td>同名选项直接写</td><td><strong>覆盖</strong>默认</td><td>想改掉默认行为</td></tr>
+      <tr><td><code>prepend_*</code></td><td>插到默认<strong>前面</strong>（叠加）</td><td>在默认之上加自己的（99% 场景）</td></tr>
+      <tr><td><code>append_*</code></td><td>插到默认<strong>后面</strong>（叠加）</td><td>同上，优先级更低</td></tr>
+    </tbody>
+  </table>
+  <p>适用范围：<strong>keymap、fetchers、open / icon / previewer / preloader 规则</strong>。</p>
+  <pre><code># keymap.toml —— 叠加示例（不覆盖默认键）
+[mgr]
+prepend_keymap = [
+  { on = [ "t", "g" ], run = "plugin simple-tag -- toggle-tag", desc = "切换标签" },
+]
+
+# yazi.toml —— 覆盖示例（改掉默认）
+[mgr]
+show_hidden = true</code></pre>
+
+  <h2>配置目录 & 跨平台</h2>
+  <table>
+    <thead><tr><th>平台</th><th>默认目录</th></tr></thead>
+    <tbody>
+      <tr><td>Unix（WSL/Mac/Linux）</td><td><code>~/.config/yazi/</code></td></tr>
+      <tr><td>Windows</td><td><code>%AppData%\yazi\config\</code></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><strong>文件通用</strong>：四平台目录里的 TOML/Lua 完全一样，无平台差异。</li>
+    <li><strong>改目录</strong>：<code>YAZI_CONFIG_HOME=/path yazi</code>（官方支持，整目录迁移）。</li>
+    <li><strong>同步方案</strong>（推荐）：在默认目录里 <code>git init</code>，<code>.gitignore</code> 排掉 <code>plugins/</code>（每机 <code>ya pkg add</code> 重装）和 <code>tags/</code>（按绝对路径存，跨机器不通用）。四台机器各自 clone 进自己的默认目录，<code>git pull/push</code> 同步。</li>
+  </ul>
+
+  <h2>新机器初始化（固定两步）</h2>
+  <pre><code># 1. clone 配置进本机默认目录
+#    Unix:  ~/.config/yazi/
+#    Win:   %AppData%\yazi\config\
+git clone git@github.com:你/yazi-config.git &lt;本机默认目录&gt;
+
+# 2. 重装插件（plugins/ 未入库）
+ya pkg add boydaihungst/simple-tag</code></pre>
+
+  <h2>常见坑</h2>
+  <ul>
+    <li><code>[mgr]</code> 不是 <code>[manager]</code>（v25+ 改名）；键用数组 <code>on=["t","g"]</code> 不是单键。</li>
+    <li>yazi v26+ fetcher 必填 <code>group = "..."</code>，少写报 <code>missing field group</code>（simple-tag README 主示例漏写，过时）。</li>
+    <li><code>ya pkg add</code> 是 v25+ 命令；旧的 <code>ya pack -a</code> 已废。</li>
+    <li><kbd>s</kbd> 搜索需要 <code>fd</code> 或 <code>fdfind</code>（二选一）；<kbd>S</kbd> 需要 <code>rg</code>。干净系统没装则失效。</li>
+  </ul>
+
+  <div class="footer">
+    <div class="row">
+      <span><a href="../lessons/0007-config-and-dotfiles.html">← 第 6 课 · 配置与跨平台同步</a></span>
+      <span>参考文档 0001</span>
+      <span>基于官方 Configuration 文档 v26.5.6</span>
+    </div>
+  </div>
+
+</article>
+</body>
+</html>

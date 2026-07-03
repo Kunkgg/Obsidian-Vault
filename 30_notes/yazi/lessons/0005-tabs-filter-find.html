@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 4 课 · 多 tab 与查找</title>
+<link rel="stylesheet" href="../assets/yazi-course.css">
+</head>
+<body>
+<article class="lesson">
+
+  <p class="eyebrow">Yazi 课程 · 第 4 课</p>
+  <h1>多 tab 与查找</h1>
+  <p class="subtitle">两个让「快」真正落地的能力——并排开几个目录，以及在任意深度一秒定位文件。</p>
+
+  <div class="callout win">
+    <span class="tag">本课的胜利</span>
+    <p>开多个 <strong>tab</strong> 并行处理不同目录，还能跨 tab 复制/移动文件；以及分清<strong>过滤 / 查找 / 搜索</strong>三种「找文件」的方式，按场合挑最快的那个，不再靠肉眼滚列表。</p>
+  </div>
+
+  <h2>多 tab：并排打开几个目录</h2>
+  <p>一个 tab 就是一个独立的目录视图——各自导航、互不打扰。你不必为了在两个目录间搬东西而反复 <code>cd</code> 进出。</p>
+  <table>
+    <thead><tr><th>键</th><th>动作</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>t</kbd><kbd>t</kbd></td><td>在当前目录新建一个 tab</td></tr>
+      <tr><td><kbd>1</kbd>-<kbd>9</kbd></td><td>切到第 N 个 tab</td></tr>
+      <tr><td><kbd>[</kbd> / <kbd>]</kbd></td><td>上一个 / 下一个 tab</td></tr>
+      <tr><td><kbd>{</kbd> / <kbd>}</kbd></td><td>与上一个 / 下一个 tab 交换位置</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>c</kbd></td><td>关闭当前 tab</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <span class="tag">记忆钩子</span>
+    <p><kbd>t</kbd> 是 tab 前缀（和你已经熟的 <kbd>g</kbd>、<kbd>c</kbd> 前缀一个套路），所以新建是 <kbd>t</kbd><kbd>t</kbd>；数字 <kbd>1</kbd>-<kbd>9</kbd> 直达；<kbd>[</kbd><kbd>]</kbd> 翻动。新 tab 继承你<strong>当前所在目录</strong>，不是 home。</p>
+  </div>
+  <div class="callout pitfall">
+    <span class="tag">别按错退出键</span>
+    <p>关掉一个 tab 是 <kbd>Ctrl</kbd>+<kbd>c</kbd>。<kbd>q</kbd> 是退出<strong>整个 yazi</strong>（配合 <code>y</code> wrapper 还会 cd 到当前目录）。关单个 tab 别按成 <kbd>q</kbd>。</p>
+  </div>
+
+  <h3>跨 tab 复制 / 移动——tab 的核心价值</h3>
+  <p>yazi 的剪贴板（yank / cut）是<strong>全局的</strong>，不局限在一个 tab 里。所以最常见的玩法是：</p>
+  <ol class="steps">
+    <li>tab A：导航到源目录，<kbd>Space</kbd> 选中文件，<kbd>y</kbd>（拷）或 <kbd>x</kbd>（剪）。</li>
+    <li><kbd>t</kbd><kbd>t</kbd> 开新 tab，<kbd>l</kbd> 进目标目录。</li>
+    <li><kbd>p</kbd> 粘贴——文件就过来了。</li>
+  </ol>
+  <p>第 2 课学的 <kbd>y</kbd>/<kbd>x</kbd>/<kbd>p</kbd> 原封不动，只是换了张 tab。这也是 ranger/lf 用户最容易忽略的提速点。</p>
+
+  <h2>找文件的三种姿势（本课重点）</h2>
+  <p>yazi 有三个看起来很像、但<strong>范围完全不同</strong>的「找」。搞清区别，你就知道每个场合该用哪个，不用再滚长列表：</p>
+  <table>
+    <thead><tr><th>键</th><th>干什么</th><th>范围</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>f</kbd></td><td>边打字边<strong>收窄可见列表</strong>（隐藏不匹配项）</td><td>当前目录</td></tr>
+      <tr><td><kbd>/</kbd> <kbd>?</kbd></td><td>移动<strong>光标</strong>到下一个 / 上一个匹配名</td><td>当前目录</td></tr>
+      <tr><td><kbd>n</kbd> <kbd>N</kbd></td><td>在已找到的匹配间向后 / 向前翻</td><td>（配合 <kbd>/</kbd>）</td></tr>
+      <tr><td><kbd>s</kbd></td><td>用 <strong>fd</strong> 按<strong>文件名</strong>递归搜</td><td>整棵子树</td></tr>
+      <tr><td><kbd>S</kbd></td><td>用 <strong>ripgrep</strong> 按<strong>文件内容</strong>递归搜</td><td>整棵子树</td></tr>
+    </tbody>
+  </table>
+
+  <h3>什么时候用哪个</h3>
+  <ul>
+    <li>只想看当前目录里某一类（比如所有 <code>.txt</code>）→ <kbd>f</kbd>，给当前视图加个临时筛子，<kbd>Esc</kbd> 清除。</li>
+    <li>当前目录文件多，想跳到某个名字（如 <code>report</code> 开头）→ <kbd>/</kbd> 输入，<kbd>n</kbd>/<kbd>N</kbd> 在匹配间翻——就是 vim 里那个 <kbd>/</kbd>，<strong>不隐藏</strong>任何文件，只挪光标。</li>
+    <li>不知道文件埋在哪层子目录，按<strong>名字</strong>找 → <kbd>s</kbd>（fd 递归）。</li>
+    <li>要找「哪个文件<strong>里写了</strong> XXX」→ <kbd>S</kbd>（ripgrep 搜内容）。</li>
+  </ul>
+  <div class="callout">
+    <span class="tag">记忆钩子</span>
+    <p><kbd>f</kbd> = filter（收窄当前列表）；<kbd>/</kbd> 就是你 vim 里那个 <kbd>/</kbd>（当前列表里跳光标）；小写 <kbd>s</kbd> 搜<strong>名字</strong>、大写 <kbd>S</kbd> 搜<strong>内容</strong>——大写 = 更「深」，钻进文件里面去。<kbd>s</kbd>/<kbd>S</kbd> 跑起来时按 <kbd>Ctrl</kbd>+<kbd>s</kbd> 可取消。</p>
+  </div>
+
+  <div class="callout win">
+    <span class="tag">✅ 实测：<kbd>s</kbd> 在本机开箱可用</span>
+    <p>你这台 Ubuntu 把 fd 装成了 <code>fdfind</code>、<code>fd</code> 只是个 shell 别名——但 yazi 在找不到 <code>fd</code> 时<strong>会自动回退到 <code>fdfind</code></strong>（已从 yazi 二进制确认），所以 <kbd>s</kbd> 正常工作，<strong>无需手动建软链</strong>。<kbd>S</kbd> 用的 <code>rg</code> 是真二进制（<code>/usr/bin/rg</code>），也没问题。<em>跨平台提醒</em>：换到一台<strong>既没 <code>fd</code> 也没 <code>fdfind</code></strong> 的机器（比如干净容器），<kbd>s</kbd> 才会失效——届时装个 fd 即可。</p>
+  </div>
+
+  <h2>动手验证（沙盒）</h2>
+  <div class="callout verify">
+    <span class="tag">跟着做</span>
+    <ol class="steps">
+      <li><code>cd ~/yazi-practice && y</code>。</li>
+      <li><strong>tab：</strong><kbd>t</kbd><kbd>t</kbd> 开新 tab → <kbd>1</kbd> 回第一个 → <kbd>]</kbd> 切下一个 → <kbd>Ctrl</kbd>+<kbd>c</kbd> 关掉当前的。</li>
+      <li><strong>跨 tab 复制：</strong>tab 1 选中 <code>a1.txt</code>（<kbd>Space</kbd>），<kbd>y</kbd> 拷；<kbd>t</kbd><kbd>t</kbd> 新 tab，<kbd>l</kbd> 进 <code>sub</code>，<kbd>p</kbd> 粘贴 → <code>sub</code> 里出现副本。<kbd>Ctrl</kbd>+<kbd>c</kbd> 关掉这个 tab。</li>
+      <li><strong>过滤：</strong>回根目录，按 <kbd>f</kbd> 打 <code>txt</code> → 只剩 <code>a1.txt b1.txt</code>（<code>sub</code> 里的也算）；<kbd>Esc</kbd> 清除，列表复原。</li>
+      <li><strong>查找：</strong>按 <kbd>/</kbd> 输 <code>c</code> → 光标跳到 <code>c.md</code>；<kbd>Esc</kbd> 退出。</li>
+      <li><strong>搜名字：</strong>按 <kbd>s</kbd> 输 <code>report</code> → 应能在结果里挑出 <code>sub/buried_report.md</code>（它不在当前视图里，证明是<strong>递归</strong>搜）。<strong>若报 fd 错误，记下来反馈我。</strong></li>
+      <li><strong>搜内容：</strong>按 <kbd>S</kbd> 输 <code>quarterly</code> → ripgrep 找到 <code>sub/buried_report.md</code>（按内容命中）。</li>
+    </ol>
+  </div>
+
+  <div class="quiz">
+    <span class="tag">检索练习 · 答案都是一键</span>
+    <p>1. 只想给当前目录加个临时筛子、边打字边收窄可见列表？</p>
+    <p>2. 当前目录里，vim 风格把光标跳到下一个匹配的文件名？</p>
+    <p>3. 不知道埋在哪层，递归整棵子树按<strong>文件名</strong>搜？</p>
+    <p>4. 递归整棵子树，按<strong>文件内容</strong>搜？</p>
+    <details><summary>看答案</summary>
+    <p>1. <kbd>f</kbd>（filter）　2. <kbd>/</kbd>（find，<kbd>n</kbd>/<kbd>N</kbd> 翻）　3. <kbd>s</kbd>（fd 按名）　4. <kbd>S</kbd>（rg 按内容）</p>
+    <p>tab 那组速记：新建 <kbd>t</kbd><kbd>t</kbd> · 切换 <kbd>1</kbd>-<kbd>9</kbd> / <kbd>[</kbd><kbd>]</kbd> · 关闭 <kbd>Ctrl</kbd>+<kbd>c</kbd>。</p>
+    </details>
+  </div>
+
+  <h2>下一步</h2>
+  <p>下一课进入<strong>文件标签（tags）</strong>：用 <code>simple-tag.yazi</code> 插件给文件打标签、按标签筛选——给「跨目录管一类文件」补上组织手段。</p>
+
+  <div class="footer">
+    <div class="row">
+      <span><a href="0004-bulk-rename-and-paths.html">← 第 3 课 · 批量改名与拷路径</a></span>
+      <span>第 4 / 8 课</span>
+      <span><a href="0006-file-tags.html">第 5 课 · 文件标签 →</a></span>
+    </div>
+    <p class="source">主源：<a href="https://yazi-rs.github.io/docs/quick-start/#multi-tab" target="_blank" rel="noopener">官方 Quick Start · Multi-tab</a>、<a href="https://yazi-rs.github.io/docs/quick-start/#filter-files" target="_blank" rel="noopener">Filter / Find / Search</a>（已按 v26.5.6 核对，与你装的版本一致）。</p>
+    <div class="ask">💡 本课已实测通过：<kbd>s</kbd>/<kbd>S</kbd> 搜索与跨 tab 复制都正常。下一课<strong>文件标签</strong>见 <a href="0006-file-tags.html">第 5 课</a>。任何「过滤 vs 查找 vs 搜索」分不清的地方随时问。</div>
+  </div>
+
+</article>
+</body>
+</html>
